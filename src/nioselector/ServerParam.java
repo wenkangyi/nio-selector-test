@@ -2,10 +2,13 @@ package nioselector;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+//import java.nio.ByteBuffer;
+//import java.nio.channels.SelectionKey;
+//import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 import nioselector.niodata.ClientConnParam;
 import nioselector.niodata.ClientRwData;
@@ -31,20 +34,14 @@ public class ServerParam {
  	 * 	允许的最大连接数
  	 * */
  	private Integer maxConnNum = 256;
-	/**
-	 * 	用于监听
-	 * 	目前多个Selector不能用，所以accept与read都采用这个selector
-	 * */
- 	public Selector acceptSelector = null;
-	/**
-	 * 	用于接收
-	 * 	客户端连接上，才注册
-	 * */
- 	public Selector readSelector = null;
  	/**
  	 * 	客户端的参数读写数组
  	 * */
  	private ClientConnParam[] clientConnParams = null;
+ 	/**
+ 	 * 	通过字符串与ClientConnParam[]数组的下标进行关联
+ 	 * */
+ 	private Map<SocketChannel ,Integer> clientConnMap = new HashMap<SocketChannel ,Integer>();
  	/**
  	 * 	连接数队列，用于标注ClientRwParam的下标
  	 * */
@@ -65,57 +62,16 @@ public class ServerParam {
  	 * 	服务端通道
  	 * */
  	private ServerSocketChannel serverSocketChannel = null;
- 	/**
- 	 * 	接收缓冲区
- 	 * */
- 	private ByteBuffer readBuff = ByteBuffer.allocate(8192);
- 	/**
- 	 * 	发送缓冲区
- 	 * */
- 	private ByteBuffer writeBuff = ByteBuffer.allocate(8192);
- 	
- 	/*public ServerParam() {
- 		try {
-	 		serverSocketChannel = ServerSocketChannel.open();
-	 		serverSocketChannel.socket().bind(new InetSocketAddress(serverPort));
-	 		serverSocketChannel.configureBlocking(false);
- 			System.out.println("服务端：" + serverSocketChannel.getLocalAddress());
-	 		acceptSelector = Selector.open();
-	        // 注册 channel，并且指定感兴趣的事件是 Accept
-	        serverSocketChannel.register(acceptSelector, SelectionKey.OP_ACCEPT);
-	        
-	        readSelector = Selector.open();//客户端连接上，才注册
-	        
-	        System.out.println("ServerParam init...");
- 		}catch(IOException ex) {}
- 		
- 		clientConnParams = new ClientConnParam[maxConnNum];
- 		for(int i=0;i<maxConnNum;i++) {
- 			clientConnParams[i] = new ClientConnParam();
- 			connNumQueue.DeQueue(i);
- 		}
- 		System.out.println("connNumQueue初始化完成，size:" 
- 					+ connNumQueue.getQueueSize());
- 		
-        //writeBuff.put("received".getBytes());
-        //writeBuff.flip();
- 	}*/
  	
  	public ServerParam(Integer serverPort) {
  		this.serverPort = serverPort;
 
  		try {
- 			readSelector = Selector.open();//客户端连接上，才注册
- 			
 	 		serverSocketChannel = ServerSocketChannel.open();
 	 		serverSocketChannel.socket().bind(new InetSocketAddress(serverPort));
 	 		serverSocketChannel.configureBlocking(false);
  			System.out.println("服务端：" + serverSocketChannel.getLocalAddress());
-	 		acceptSelector = Selector.open();
-	        // 注册 channel，并且指定感兴趣的事件是 Accept
-	        serverSocketChannel.register(acceptSelector, SelectionKey.OP_ACCEPT);
-	        
-	        
+	 		
 	        System.out.println("ServerParam init...");
  		}catch(IOException ex) {}
  		
@@ -173,19 +129,12 @@ public class ServerParam {
  		return maxConnNum;
  	}
  	
- 	public Selector getAcceptSelector() {
- 		return acceptSelector;
- 	}
- 	
- 	//暂时不用set
- 	//public void setAcceptSelector()
- 	
- 	public Selector getReadSelector() {
- 		return readSelector;
- 	}
- 	
  	public ClientConnParam[] getClientConnParams() {
  		return clientConnParams;
+ 	}
+ 	
+ 	public Map<SocketChannel,Integer> getClientConnMap(){
+ 		return clientConnMap;
  	}
  	
  	public TQueue<Integer> getConnNumQueue(){
@@ -208,11 +157,4 @@ public class ServerParam {
  		return serverSocketChannel;
  	}
  	
- 	public ByteBuffer getReadBuff() {
- 		return readBuff;
- 	}
- 	
- 	public ByteBuffer getWriteBuff() {
- 		return writeBuff;
- 	}
 }

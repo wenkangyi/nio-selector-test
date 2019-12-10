@@ -1,7 +1,7 @@
 package selectortest;
 
 
-/*import java.io.IOException;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -9,7 +9,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.Set;*/
+import java.util.Set;
 
 /*import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -54,7 +54,7 @@ public class SelectorTestx {
     	
         try {
             ssc = ServerSocketChannel.open();
-            ssc.socket().bind(new InetSocketAddress(8000));
+            ssc.socket().bind(new InetSocketAddress(54321));
             ssc.configureBlocking(false);
 
             selector = Selector.open();

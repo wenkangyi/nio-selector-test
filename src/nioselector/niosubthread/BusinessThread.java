@@ -31,6 +31,8 @@ public class BusinessThread implements Runnable {
 			cwd.setMsg("Hello," + crd.getMsg());
 			serverParam.getWMsgQueue().DeQueue(cwd);
 		}
+		
+		System.out.println("业务线程退出");
 	}
 
 }

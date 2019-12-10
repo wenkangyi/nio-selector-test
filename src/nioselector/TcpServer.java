@@ -1,5 +1,8 @@
 package nioselector;
 
+import java.io.IOException;
+import java.nio.channels.Selector;
+
 import nioselector.niosubthread.BusinessThread;
 import nioselector.niosubthread.ListingThread;
 import nioselector.niosubthread.RecvThread;
@@ -18,9 +21,9 @@ public class TcpServer implements Runnable {
 	public ServerParam serverParam = null;
 	
 	private Thread listingThread = null;
-	private Thread recvThread = null;
 	private Thread timeOutThread = null;
 	private Thread sendThread = null;
+	private Thread recvThread = null;
 	private Thread businessThread = null;
 	
 	public TcpServer(Integer serverPort) {
@@ -55,7 +58,14 @@ public class TcpServer implements Runnable {
 		listingThread.setName("listing");
 		listingThread.start();
 		
-		/*Runnable recv = new RecvThread(serverParam);
+		
+		/*try {
+			RecvThread.gReadSelector = Selector.open();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Runnable recv = new RecvThread(serverParam);
 		recvThread = new Thread(recv);
 		recvThread.setDaemon(true);
 		recvThread.setName("recv");
@@ -99,7 +109,6 @@ public class TcpServer implements Runnable {
 		}
 		
 		listingThread = null;
-		recvThread = null;
 		timeOutThread = null;
 		sendThread = null;
 	}
