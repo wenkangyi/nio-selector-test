@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import nioselector.ServerParam;
+import nioselector.convertPackage.ConvertDateTime;
 import nioselector.niodata.ClientRwData;
 
 
@@ -138,10 +139,11 @@ public class ListingThread implements Runnable {
             System.out.println("接收到地址：" + socketChannel.getRemoteAddress() + " 的字节数：" + recNum);
             if(recNum <= 0) {
             	System.out.println("客户端 " + socketChannel.getRemoteAddress() + " 主动退出，正在关闭客户端。。。");
+            	updateClostTime(socketChannel);
             	socketChannel.close();//就用这一句就可以实现快速回收了
             	//key.cancel();
             	//selector.selectNow();
-            	System.out.println("客户端   关闭完成！");
+            	//System.out.println("客户端   关闭完成！");
             	return;
             }
             readBuff.flip();
@@ -154,6 +156,8 @@ public class ListingThread implements Runnable {
             serverParam.getRMsgQueue().DeQueue(clientRwData);
             System.out.println("数据已写存入  serverParam.getRMsgQueue()=" 
             		+ serverParam.getRMsgQueue().getQueueSize() );
+            
+            updateOnlineTime(socketChannel);
     	}catch(IOException ex) {
     		System.out.println("读数据异常!" );
     	}
@@ -164,6 +168,7 @@ public class ListingThread implements Runnable {
 	 * */
 	private void addTimeoutDetection(SocketChannel socketChannel) {
 		Integer index = serverParam.getConnNumQueue().EnQueue();
+		System.out.println("连接号： " + index + " 的设备上线");
         serverParam.getClientConnParams()[index].setCurrTime(new Date());
         serverParam.getClientConnParams()[index].setConnFlag(true);
         serverParam.getClientConnParams()[index].setUseFlag(true);
@@ -172,5 +177,18 @@ public class ListingThread implements Runnable {
         serverParam.getClientConnMap().put(socketChannel, index);
     }
 	
+	/**
+	 * 	更新在线时间
+	 * */
+	private void updateOnlineTime(SocketChannel socketChannel) {
+		Integer index = serverParam.getClientConnMap().get(socketChannel);
+		serverParam.getClientConnParams()[index].setCurrTime(new Date());
+	}
+	
+	private void updateClostTime(SocketChannel socketChannel) {
+		Integer index = serverParam.getClientConnMap().get(socketChannel);
+		serverParam.getClientConnParams()[index]
+				.setCurrTime(ConvertDateTime.addSec2Datd(-(serverParam.getOfflineTime() + 3)));
+	}
 }
 

@@ -29,11 +29,11 @@ public class ServerParam {
  	/**
  	 * 	离线时间 ，单位：秒
  	 * */
- 	private Integer offlineTime = 30;
+ 	private Integer offlineTime = 10;
  	/**
  	 * 	允许的最大连接数
  	 * */
- 	private Integer maxConnNum = 256;
+ 	private Integer maxConnNum = 5;
  	/**
  	 * 	客户端的参数读写数组
  	 * */

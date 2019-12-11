@@ -2,7 +2,9 @@ package nioselector.convertPackage;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class ConvertDateTime {
 	/** 
@@ -96,4 +98,15 @@ public class ConvertDateTime {
 	   int c = (int)((a - b) / 1000); 
 	   return c; 
    }
+   
+   public static Date addSec2Datd(Integer sec) {
+	   //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	   Calendar c = new GregorianCalendar();
+	   Date date = new Date();
+	   c.setTime(date);//设置参数时间
+	   c.add(Calendar.SECOND,sec);//把日期往后增加SECOND 秒.整数往后推,负数往前移动
+	   date=c.getTime(); //这个时间就是日期往后推一天的结果
+	   return date;
+   }
+   
 }
